@@ -1,34 +1,195 @@
-import { ConstructorPage } from '@pages';
+import {
+  BrowserRouter,
+  Location,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate
+} from 'react-router-dom';
+import {
+  ConstructorPage,
+  Feed,
+  ForgotPassword,
+  Login,
+  NotFound404,
+  Profile,
+  ProfileOrders,
+  Register,
+  ResetPassword
+} from '@pages';
+import { Preloader } from '@ui';
 import '../../index.css';
 import styles from './app.module.css';
 
-import { AppHeader } from '@components';
-import { Preloader } from '@ui';
+import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
+import { ReactElement, useEffect } from 'react';
+import { getCookie } from '../../utils/cookie';
+import { useDispatch, useSelector } from '../../services/store';
+import {
+  fetchUser,
+  selectIsAuthChecked,
+  selectIsAuthenticated,
+  setAuthChecked
+} from '../../services/slices/authSlice';
+import {
+  fetchIngredients,
+  selectIngredients,
+  selectIngredientsStatus
+} from '../../services/slices/ingredientsSlice';
 
-const App = () => {
-  /** TODO: взять переменные из стора */
-  const isIngredientsLoading = false;
-  const ingredients = [];
-  const error = null;
+type ProtectedRouteProps = {
+  element: ReactElement;
+  onlyUnAuth?: boolean;
+};
+
+type TRouteLocationState = {
+  background?: Location;
+  from?: Location;
+};
+
+const ProtectedRoute = ({
+  element,
+  onlyUnAuth = false
+}: ProtectedRouteProps) => {
+  const location = useLocation();
+  const isAuthenticated = useSelector(selectIsAuthenticated);
+  const isAuthChecked = useSelector(selectIsAuthChecked);
+  const state = location.state as TRouteLocationState | null;
+
+  if (!isAuthChecked) {
+    return <Preloader />;
+  }
+
+  if (onlyUnAuth) {
+    return isAuthenticated ? (
+      <Navigate to={state?.from?.pathname || '/'} replace />
+    ) : (
+      element
+    );
+  }
+
+  return isAuthenticated ? (
+    element
+  ) : (
+    <Navigate to='/login' state={{ from: location }} replace />
+  );
+};
+
+type TLocationState = {
+  background?: Location;
+};
+
+const AppRoutes = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const ingredients = useSelector(selectIngredients);
+  const ingredientsStatus = useSelector(selectIngredientsStatus);
+  const isAuthChecked = useSelector(selectIsAuthChecked);
+  const state = location.state as TLocationState | null;
+  const backgroundLocation = state?.background;
+
+  const closeModal = () => navigate(-1);
+
+  useEffect(() => {
+    if (!isAuthChecked && getCookie('accessToken')) {
+      dispatch(fetchUser());
+      return;
+    }
+
+    if (!isAuthChecked) {
+      dispatch(setAuthChecked(true));
+    }
+  }, [dispatch, isAuthChecked]);
+
+  useEffect(() => {
+    if (!ingredients.length && ingredientsStatus === 'idle') {
+      dispatch(fetchIngredients());
+    }
+  }, [dispatch, ingredients.length, ingredientsStatus]);
 
   return (
     <div className={styles.app}>
       <AppHeader />
-      {isIngredientsLoading ? (
-        <Preloader />
-      ) : error ? (
-        <div className={`${styles.error} text text_type_main-medium pt-4`}>
-          {error}
-        </div>
-      ) : ingredients.length > 0 ? (
-        <ConstructorPage />
-      ) : (
-        <div className={`${styles.title} text text_type_main-medium pt-4`}>
-          Нет игредиентов
-        </div>
+      <Routes location={backgroundLocation || location}>
+        <Route path='/' element={<ConstructorPage />} />
+        <Route path='/feed' element={<Feed />} />
+        <Route path='/feed/:number' element={<OrderInfo />} />
+        <Route path='/ingredients/:id' element={<IngredientDetails />} />
+        <Route
+          path='/login'
+          element={<ProtectedRoute onlyUnAuth element={<Login />} />}
+        />
+        <Route
+          path='/register'
+          element={<ProtectedRoute onlyUnAuth element={<Register />} />}
+        />
+        <Route
+          path='/forgot-password'
+          element={<ProtectedRoute onlyUnAuth element={<ForgotPassword />} />}
+        />
+        <Route
+          path='/reset-password'
+          element={<ProtectedRoute onlyUnAuth element={<ResetPassword />} />}
+        />
+        <Route
+          path='/profile'
+          element={<ProtectedRoute element={<Profile />} />}
+        />
+        <Route
+          path='/profile/orders'
+          element={<ProtectedRoute element={<ProfileOrders />} />}
+        />
+        <Route
+          path='/profile/orders/:number'
+          element={<ProtectedRoute element={<OrderInfo />} />}
+        />
+        <Route path='*' element={<NotFound404 />} />
+      </Routes>
+
+      {backgroundLocation && (
+        <Routes>
+          <Route
+            path='/feed/:number'
+            element={
+              <Modal title='' onClose={closeModal}>
+                <OrderInfo />
+              </Modal>
+            }
+          />
+          <Route
+            path='/ingredients/:id'
+            element={
+              <Modal title='Детали ингредиента' onClose={closeModal}>
+                <IngredientDetails />
+              </Modal>
+            }
+          />
+          <Route
+            path='/profile/orders/:number'
+            element={
+              <ProtectedRoute
+                element={
+                  <Modal title='' onClose={closeModal}>
+                    <OrderInfo />
+                  </Modal>
+                }
+              />
+            }
+          />
+        </Routes>
       )}
     </div>
   );
 };
+
+const App = () => (
+  <BrowserRouter
+    future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+  >
+    <AppRoutes />
+  </BrowserRouter>
+);
 
 export default App;
