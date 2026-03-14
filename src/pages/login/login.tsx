@@ -1,6 +1,7 @@
-import { FC, SyntheticEvent, useEffect, useState } from 'react';
+import { FC, SyntheticEvent, useEffect } from 'react';
 import { Location, useLocation, useNavigate } from 'react-router-dom';
 import { LoginUI } from '@ui-pages';
+import { useForm } from '../../hooks';
 import { useDispatch, useSelector } from '../../services/store';
 import {
   clearAuthError,
@@ -13,8 +14,10 @@ export const Login: FC = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { values, handleChange } = useForm({
+    email: '',
+    password: ''
+  });
   const errorText = useSelector(selectAuthError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const from = (location.state as { from?: Location } | null)?.from?.pathname;
@@ -31,16 +34,15 @@ export const Login: FC = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    dispatch(loginUser({ email, password }));
+    dispatch(loginUser(values));
   };
 
   return (
     <LoginUI
       errorText={errorText || ''}
-      email={email}
-      setEmail={setEmail}
-      password={password}
-      setPassword={setPassword}
+      email={values.email}
+      password={values.password}
+      handleChange={handleChange}
       handleSubmit={handleSubmit}
     />
   );

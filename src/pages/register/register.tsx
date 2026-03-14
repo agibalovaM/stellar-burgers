@@ -1,6 +1,7 @@
-import { FC, SyntheticEvent, useEffect, useState } from 'react';
+import { FC, SyntheticEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RegisterUI } from '@ui-pages';
+import { useForm } from '../../hooks';
 import { useDispatch, useSelector } from '../../services/store';
 import {
   clearAuthError,
@@ -12,9 +13,11 @@ import {
 export const Register: FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [userName, setUserName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const { values, handleChange } = useForm({
+    userName: '',
+    email: '',
+    password: ''
+  });
   const errorText = useSelector(selectAuthError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
 
@@ -30,18 +33,22 @@ export const Register: FC = () => {
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault();
-    dispatch(registerUser({ email, name: userName, password }));
+    dispatch(
+      registerUser({
+        email: values.email,
+        name: values.userName,
+        password: values.password
+      })
+    );
   };
 
   return (
     <RegisterUI
       errorText={errorText || ''}
-      email={email}
-      userName={userName}
-      password={password}
-      setEmail={setEmail}
-      setPassword={setPassword}
-      setUserName={setUserName}
+      email={values.email}
+      userName={values.userName}
+      password={values.password}
+      handleChange={handleChange}
       handleSubmit={handleSubmit}
     />
   );

@@ -1,7 +1,6 @@
 import {
   BrowserRouter,
   Location,
-  Navigate,
   Route,
   Routes,
   useLocation,
@@ -22,14 +21,19 @@ import { Preloader } from '@ui';
 import '../../index.css';
 import styles from './app.module.css';
 
-import { AppHeader, IngredientDetails, Modal, OrderInfo } from '@components';
-import { ReactElement, useEffect } from 'react';
+import {
+  AppHeader,
+  IngredientDetails,
+  Modal,
+  OrderInfo,
+  ProtectedRoute
+} from '@components';
+import { useEffect } from 'react';
 import { getCookie } from '../../utils/cookie';
 import { useDispatch, useSelector } from '../../services/store';
 import {
   fetchUser,
   selectIsAuthChecked,
-  selectIsAuthenticated,
   setAuthChecked
 } from '../../services/slices/authSlice';
 import {
@@ -37,44 +41,6 @@ import {
   selectIngredients,
   selectIngredientsStatus
 } from '../../services/slices/ingredientsSlice';
-
-type ProtectedRouteProps = {
-  element: ReactElement;
-  onlyUnAuth?: boolean;
-};
-
-type TRouteLocationState = {
-  background?: Location;
-  from?: Location;
-};
-
-const ProtectedRoute = ({
-  element,
-  onlyUnAuth = false
-}: ProtectedRouteProps) => {
-  const location = useLocation();
-  const isAuthenticated = useSelector(selectIsAuthenticated);
-  const isAuthChecked = useSelector(selectIsAuthChecked);
-  const state = location.state as TRouteLocationState | null;
-
-  if (!isAuthChecked) {
-    return <Preloader />;
-  }
-
-  if (onlyUnAuth) {
-    return isAuthenticated ? (
-      <Navigate to={state?.from?.pathname || '/'} replace />
-    ) : (
-      element
-    );
-  }
-
-  return isAuthenticated ? (
-    element
-  ) : (
-    <Navigate to='/login' state={{ from: location }} replace />
-  );
-};
 
 type TLocationState = {
   background?: Location;
