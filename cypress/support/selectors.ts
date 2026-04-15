@@ -1,0 +1,21 @@
+export const selectors = {
+  modal: '[data-cy="modal"]',
+  modalClose: '[data-cy="modal-close"]',
+  modalOverlay: '[data-cy="modal-overlay"]',
+  ingredientDetails: '[data-cy="ingredient-details"]',
+  ingredientDetailsName: '[data-cy="ingredient-details-name"]',
+  constructorBunTop: '[data-cy="constructor-bun-top"]',
+  constructorBunBottom: '[data-cy="constructor-bun-bottom"]',
+  constructorIngredient: '[data-cy="constructor-ingredient"]',
+  constructorBunTopEmpty: '[data-cy="constructor-bun-top-empty"]',
+  constructorBunBottomEmpty: '[data-cy="constructor-bun-bottom-empty"]',
+  constructorFillingsEmpty: '[data-cy="constructor-fillings-empty"]',
+  orderButton: '[data-cy="order-button"]',
+  orderDetails: '[data-cy="order-details"]',
+  orderNumber: '[data-cy="order-number"]',
+  ingredientAddBun1: '[data-cy="ingredient-add-bun-1"]',
+  ingredientAddMain1: '[data-cy="ingredient-add-main-1"]',
+  ingredientAddSauce1: '[data-cy="ingredient-add-sauce-1"]',
+  ingredientLinkMain1: '[data-cy="ingredient-link-main-1"]',
+  ingredientLinkSauce1: '[data-cy="ingredient-link-sauce-1"]'
+} as const;
