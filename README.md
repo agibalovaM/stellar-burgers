@@ -1,19 +1,49 @@
-# Проектная работа 11-го спринта Project Stellar Burgers
+# 🍔 Stellar Burgers
 
-[Макет](<https://www.figma.com/file/vIywAvqfkOIRWGOkfOnReY/React-Fullstack_-Проектные-задачи-(3-месяца)_external_link?type=design&node-id=0-1&mode=design>)
+Single Page Application for building and ordering burgers with authentication, routing, global state management, and test coverage.
 
-[Чеклист](https://www.notion.so/praktikum/0527c10b723d4873aa75686bad54b32e?pvs=4)
+---
 
-## Этапы работы:
+## 🚀 Features
 
-1. Разверните проект и ознакомьтесь с кодом. Все необходимые вам компоненты уже созданы и лежат в папке `src/components`
+- Burger constructor (adding ingredients to build an order)  
+- User authentication and protected routes  
+- Order creation with API integration  
+- Modal windows (ingredient details, order info)  
+- Global state management with Redux Toolkit  
+- Async data handling (ingredients, user, order requests)  
 
-2. Настройте роутинг.
+---
 
-3. Напишите функционал запросов данных с сервера, используя `Redux` и глобальный `store`. Сами "ручки" уже прописаны и лежат в `utils/burger-api.ts`
+## 🧪 Testing
 
-4. Настройте авторизацию и создайте защищённые роуты.
+### Jest
+- Root reducer initialization  
+- Burger constructor reducer (add, remove, reorder ingredients)  
+- Async states (loading, success, error)  
 
-## Важно:
+### Cypress
+- Adding ingredients to constructor  
+- Opening and closing modals  
+- Full order creation flow  
+- API request mocking and interception  
 
-Для корректной работы запросов к серверу необходимо добавить переменную BURGER_API_URL в окружение. Сама ссылка находится в файле `.env.example`.
+---
+
+## 🛠 Tech Stack
+
+- React  
+- TypeScript  
+- Redux Toolkit  
+- React Router  
+- Jest  
+- Cypress  
+- Webpack  
+
+---
+
+## 📦 Installation
+
+```bash
+npm install
+npm start
